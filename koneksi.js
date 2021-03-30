@@ -9,7 +9,7 @@ const conn = mysql.createConnection({
 });
 
 conn.connect((err)=>{
-    if(err) throw err;
+    // if(err) throw err;
     console.log('Mysql terkoneksi');
 });
 
