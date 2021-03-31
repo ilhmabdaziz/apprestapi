@@ -79,7 +79,7 @@ exports.login = function(req, res){
                         console.log(error);
                     }else{
                         res.json({
-                            succes: true,
+                            success: true,
                             message: 'Token JWT tergenerate!',
                             token: token,
                             currUser: data.id_user
