@@ -5,7 +5,7 @@ exports.ok = function (values, res) {
         'status': 200,
         'values': values
     };
-
+    /// 3 console.log(values)
     res.json(data);
     res.end();
 };

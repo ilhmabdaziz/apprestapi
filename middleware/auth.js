@@ -1,10 +1,25 @@
 var connection = require('../koneksi');
 var mysql = require('mysql');
-var md5 = require('MD5');
+var md5 = require('md5');
 var response = require('../res');
 var jwt = require('jsonwebtoken');
 var config = require('../config/secret');
 var ip = require('ip');
+// var nodemailer = require('nodemailer')
+
+// let smtpTransport = nodemailer.createTransport({
+//     host: "smtp.gmail.com",
+//     port: 465,
+//     secure: true,
+//     auth: {
+//          user: "reactjstutorialindonesia@gmail.com",
+//          pass: "Reactjs2020"
+//     }
+// })
+
+// var rand, mailOptions, host, link
+// exports.verifikasi
+// exports.ubahPassword
 
 //controller untuk register
 exports.registrasi = function(req, res){
@@ -14,6 +29,7 @@ exports.registrasi = function(req, res){
         password: md5(req.body.password),
         role: req.body.role,
         tanggal_daftar : new Date()
+        // isVerified: 0
     }
 
     var query = "SELECT email FROM ?? WHERE ??=?";
@@ -44,7 +60,7 @@ exports.registrasi = function(req, res){
 }
 
 // controller untuk login
-exports.login = function(req, res){
+exports.login = function(req, res) {
     var post = {
         password: req.body.password,
         email: req.body.email
@@ -53,16 +69,23 @@ exports.login = function(req, res){
     var query = "SELECT * FROM ?? WHERE ??=? AND ??=?";
     var table = ["user", "password", md5(post.password), "email", post.email];
 
-    query = mysql.format(query,table);
-    connection.query(query, function(error, rows){
-        if(error){
+    query = mysql.format(query, table);
+    connection.query(query, function (error, rows) {
+        if(error) {
             console.log(error);
         }else{
-            if(rows.length == 1){
-                var token = jwt.sign({rows}, config.secret, {
-                    expiresIn: 1440
+            if(rows.length == 1) {
+                var token = jwt.sign({ rows }, config.secret, {
+                    expiresIn: '2400000'
                 });
                 id_user = rows[0].id;
+                //1 tambahan row username
+                username = rows[0].username;
+                //2 tambahan row role
+                role = rows[0].role;
+
+                var expired = 2400000
+                var isVerified = rows[0].isVerified
 
                 var data = {
                     id_user: id_user,
@@ -74,7 +97,7 @@ exports.login = function(req, res){
                 var table = ["akses_token"];
 
                 query = mysql.format(query, table);
-                connection.query(query, data, function(error, rows){
+                connection.query(query, data, function (error, rows) {
                     if(error){
                         console.log(error);
                     }else{
@@ -82,7 +105,14 @@ exports.login = function(req, res){
                             success: true,
                             message: 'Token JWT tergenerate!',
                             token: token,
-                            currUser: data.id_user
+                            currUser: data.id_user,
+                            //4 tambahkan expired time
+                            expires: expired,
+                            currUser: data.id_user,
+                            user: username,
+                            //3 tambahkan role
+                            role: role,
+                            isVerified: isVerified
                         });
 
                     }
