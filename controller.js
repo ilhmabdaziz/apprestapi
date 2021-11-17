@@ -3,7 +3,7 @@ var response = require("./res");
 var connection = require("./koneksi");
 
 exports.index = function (req, res) {
-  response.ok("Aplikasi REST API ku berjalan!", res);
+  response.ok("Aplikasi apprestapi is running!", res);
 };
 
 //menampilkan semua data mahasiswa
@@ -20,14 +20,20 @@ exports.tampilsemuamahasiswa = function (req, res) {
 //menampilkan semua data mahasiswa bardasarkan id
 exports.tampilberdasarkanid = function (req, res) {
   let id = req.params.id;
+  // console.log(id);
   connection.query(
     "SELECT * FROM mahasiswa WHERE id_mahasiswa = ?",
     [id],
     function (error, rows, field) {
-      if (error) {
-        console.log(error);
+      if (!error) {
+        // console.log(rows.length);
+        if (rows.length === 0) {
+          response.notOk(`Data tidak ditemukan dengan id = ${id}`, res);
+        } else {
+          response.ok(rows, res);
+        }
       } else {
-        response.ok(rows, res);
+        console.log(error);
       }
     }
   );
@@ -63,10 +69,15 @@ exports.ubahmahasiswa = function (req, res) {
     "UPDATE mahasiswa SET nim=?, nama=?, jurusan=? WHERE id_mahasiswa=?",
     [nim, nama, jurusan, id],
     function (error, rows, fields) {
-      if (error) {
-        console.log(error);
+      if (!error) {
+        // console.log(rows.affectedRows);
+        if (rows.affectedRows === 0) {
+          response.notOk(`Data dengan id=${id} tidak ditemukan!!!`, res);
+        } else {
+          response.ok(`berhasil Ubah Data dengan id = ${id}`, res);
+        }
       } else {
-        response.ok("berhasil Ubah Data", res);
+        console.log(error);
       }
     }
   );
@@ -80,10 +91,15 @@ exports.hapusmahasiswa = function (req, res) {
     "DELETE FROM mahasiswa WHERE id_mahasiswa=?",
     [id],
     function (error, rows, fields) {
-      if (error) {
-        console.log(error);
+      if (!error) {
+        // console.log(rows.affectedRows);
+        if (rows.affectedRows === 0) {
+          response.notOk(`Data dengan id=${id} tidak ditemukan!!!`, res);
+        } else {
+          response.ok(`Berhasil hapus data dengan id = ${id}`, res);
+        }
       } else {
-        response.ok("Berhasil hapus data", res);
+        console.log(error);
       }
     }
   );
