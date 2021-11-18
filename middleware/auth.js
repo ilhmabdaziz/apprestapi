@@ -27,13 +27,13 @@ exports.registrasi = function (req, res) {
     username: req.body.username,
     email: req.body.email,
     password: md5(req.body.password),
-    role: req.body.role,
+    role: req.body.role || 3,
     tanggal_daftar: new Date(),
-    // isVerified: 0
+    isVerified: 0,
   };
 
-  var query = "SELECT email FROM ?? WHERE ??=?";
-  var table = ["user", "email", post.email];
+  var query = "SELECT ?? FROM ?? WHERE ??=?";
+  var table = ["email", "user", "email", post.email];
 
   query = mysql.format(query, table);
 
@@ -41,6 +41,7 @@ exports.registrasi = function (req, res) {
     if (error) {
       console.log(error);
     } else {
+      // console.log(rows);
       if (rows.length == 0) {
         var query = "INSERT INTO ?? SET ?";
         var table = ["user"];
@@ -62,22 +63,25 @@ exports.registrasi = function (req, res) {
 // controller untuk login
 exports.login = function (req, res) {
   var post = {
-    password: req.body.password,
     email: req.body.email,
+    password: req.body.password,
   };
 
   var query = "SELECT * FROM ?? WHERE ??=? AND ??=?";
   var table = ["user", "password", md5(post.password), "email", post.email];
 
   query = mysql.format(query, table);
+  // console.log(query);
   connection.query(query, function (error, rows) {
     if (error) {
       console.log(error);
     } else {
+      // console.log(rows);
       if (rows.length == 1) {
         var token = jwt.sign({ rows }, config.secret, {
           expiresIn: "2400000",
         });
+        // console.log(token);
         id_user = rows[0].id;
         //1 tambahan row username
         username = rows[0].username;
@@ -108,7 +112,6 @@ exports.login = function (req, res) {
               currUser: data.id_user,
               //4 tambahkan expired time
               expires: expired,
-              currUser: data.id_user,
               user: username,
               //3 tambahkan role
               role: role,
@@ -124,5 +127,8 @@ exports.login = function (req, res) {
 };
 
 exports.halamanrahasia = function (req, res) {
-  response.ok("Halaman ini hanya untuk user dengan role = 2!", res);
+  response.ok(
+    "Selamat Datang !!!!, Halaman ini hanya untuk user dengan role = 2!",
+    res
+  );
 };

@@ -21,14 +21,17 @@ exports.notOk = function (values, res) {
 
 //response untuk nested matakuliah
 exports.oknested = function (values, res) {
+  // console.log(values);
   //lakukan akumulasi
   const hasil = values.reduce((akumulasikan, item) => {
+    // console.log(akumulasikan[item.nama]);
     //tentukan key group
     if (akumulasikan[item.nama]) {
       //buat variabel group nama mahasiswa
       const group = akumulasikan[item.nama];
       //cek juka isi array adalah matakuliah
       if (Array.isArray(group.matakuliah)) {
+        // console.log(Array.isArray(group.matakuliah));
         //tambahkan value ke dalam groupmatakuliah
         group.matakuliah.push(item.matakuliah);
       } else {
